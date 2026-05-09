@@ -3,6 +3,7 @@ import SwiftData
 
 struct ContentView: View {
     @Environment(\.modelContext) private var modelContext
+    @AppStorage("onboardingShown") private var onboardingShown: Bool = false
 
     var body: some View {
         TabView {
@@ -23,6 +24,12 @@ struct ContentView: View {
         }
         .task {
             WordSeeder.seedIfNeeded(modelContext: modelContext)
+        }
+        .sheet(isPresented: Binding(
+            get: { !onboardingShown },
+            set: { if $0 == false { onboardingShown = true } }
+        )) {
+            OnboardingView()
         }
     }
 }

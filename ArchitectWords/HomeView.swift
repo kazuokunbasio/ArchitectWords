@@ -122,14 +122,24 @@ struct HomeView: View {
     }
 
     private func categoryTile(_ cat: WordCategory) -> some View {
-        let count = allWords.filter { $0.categoryEnum == cat }.count
-        return HStack(spacing: 10) {
-            Image(systemName: cat.systemImage).foregroundStyle(.accent)
-            VStack(alignment: .leading, spacing: 2) {
-                Text(cat.rawValue).font(.subheadline.weight(.semibold)).foregroundStyle(.primary)
-                Text("\(count) 単語").font(.caption).foregroundStyle(.secondary)
+        let inCategory = allWords.filter { $0.categoryEnum == cat }
+        let total = inCategory.count
+        let memorized = inCategory.filter { $0.isMemorized }.count
+        let ratio: Double = total > 0 ? Double(memorized) / Double(total) : 0
+        return VStack(alignment: .leading, spacing: 6) {
+            HStack(spacing: 10) {
+                Image(systemName: cat.systemImage).foregroundStyle(.accent)
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(cat.rawValue).font(.subheadline.weight(.semibold)).foregroundStyle(.primary)
+                    Text("\(memorized) / \(total) 単語")
+                        .font(.caption.monospacedDigit())
+                        .foregroundStyle(.secondary)
+                }
+                Spacer()
             }
-            Spacer()
+            ProgressView(value: ratio)
+                .tint(.accentColor)
+                .scaleEffect(x: 1, y: 0.7, anchor: .center)
         }
         .padding(12)
         .background(Color(uiColor: .secondarySystemGroupedBackground))

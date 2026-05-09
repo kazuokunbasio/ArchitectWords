@@ -61,8 +61,10 @@ Xcode で `Cmd+R` を押すと、共有スキームに `ArchitectWords.storekit`
 | Display Name | 建築士単語帳 |
 | App Store Category | Education |
 | IAP Product ID(広告削除) | `com.bashio.ArchitectWords.removeads` |
-| AdMob App ID(Info.plist) | **テスト ID `ca-app-pub-3940256099942544~1458002511` 設定中。本番は AdMob で取得した `~` 区切りに差し替えること** |
-| AdMob Banner Unit ID(コード) | **`AdsConfig.productionBannerAdUnitID` をプレースホルダから実 ID に差し替え** |
+| AdMob App ID(Info.plist) | `ca-app-pub-2165259899292420~2745306775` |
+| AdMob Banner Unit ID(コード) | `ca-app-pub-2165259899292420/3900651940` |
+| 収録単語数(初期シード v4) | **699 件**(計画 105 / 環境・設備 144 / 法規 225 / 構造 133 / 施工 92) |
+| 動作要件 | iPhone, iOS 17 以降 |
 
 ## リリース手順
 

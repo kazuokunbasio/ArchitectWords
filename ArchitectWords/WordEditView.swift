@@ -20,6 +20,11 @@ struct WordEditView: View {
     @State private var isMemorized: Bool = false
 
     @State private var showDeleteConfirm: Bool = false
+    @State private var showAddedToast: Bool = false
+
+    /// キーボード制御用。`@FocusState` で全 TextField をひと括りに管理する。
+    enum Field: Hashable { case term, reading, meaning, detail }
+    @FocusState private var focused: Field?
 
     private var isNew: Bool { word == nil }
     private var canSave: Bool {
@@ -32,15 +37,23 @@ struct WordEditView: View {
             Section("単語") {
                 TextField("単語(必須)", text: $term)
                     .textInputAutocapitalization(.never)
+                    .submitLabel(.next)
+                    .focused($focused, equals: .term)
+                    .onSubmit { focused = .reading }
                 TextField("読み(かな)", text: $reading)
                     .textInputAutocapitalization(.never)
+                    .submitLabel(.next)
+                    .focused($focused, equals: .reading)
+                    .onSubmit { focused = .meaning }
             }
 
             Section("意味") {
                 TextField("短い意味(必須)", text: $meaning, axis: .vertical)
                     .lineLimit(2...4)
+                    .focused($focused, equals: .meaning)
                 TextField("詳細解説", text: $detail, axis: .vertical)
                     .lineLimit(3...10)
+                    .focused($focused, equals: .detail)
             }
 
             Section("分類") {
@@ -82,15 +95,16 @@ struct WordEditView: View {
         }
         .navigationTitle(isNew ? "単語を追加" : "単語を編集")
         .navigationBarTitleDisplayMode(.inline)
+        .scrollDismissesKeyboard(.interactively)
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
                 Button(isNew ? "追加" : "保存") { save() }
                     .disabled(!canSave)
             }
-            if isNew {
-                ToolbarItem(placement: .topBarLeading) {
-                    Button("キャンセル") { resetForm() }
-                }
+            // キーボード上部の「完了」ボタン。これが無いとタブバーが隠れて画面遷移できない。
+            ToolbarItemGroup(placement: .keyboard) {
+                Spacer()
+                Button("完了") { focused = nil }
             }
         }
         .onAppear { loadFromWord() }
@@ -99,6 +113,18 @@ struct WordEditView: View {
             Button("削除", role: .destructive) { deleteWord() }
         } message: {
             Text("この単語をデータから削除します。元に戻せません。")
+        }
+        .overlay(alignment: .top) {
+            if showAddedToast {
+                Label("追加しました", systemImage: "checkmark.circle.fill")
+                    .font(.subheadline.weight(.semibold))
+                    .padding(.horizontal, 14)
+                    .padding(.vertical, 10)
+                    .background(.thinMaterial, in: Capsule())
+                    .foregroundStyle(.green)
+                    .padding(.top, 8)
+                    .transition(.move(edge: .top).combined(with: .opacity))
+            }
         }
     }
 
@@ -145,8 +171,17 @@ struct WordEditView: View {
 
         try? modelContext.save()
 
+        // キーボードを閉じてタブバーを露出させる。これが無いと他タブに行けない。
+        focused = nil
+
         if isNew {
             resetForm()
+            withAnimation(.spring(response: 0.35, dampingFraction: 0.85)) {
+                showAddedToast = true
+            }
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1.6) {
+                withAnimation(.easeOut(duration: 0.25)) { showAddedToast = false }
+            }
         } else {
             dismiss()
         }
