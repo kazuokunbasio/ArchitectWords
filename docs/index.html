@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>建築士単語帳</title>
+  <style>
+    :root {
+      --bg: #f6f6f8;
+      --fg: #1f1f1f;
+      --muted: #5b5b5b;
+      --accent: #2E4D6E;
+      --card: #ffffff;
+      --border: #e3e3e8;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue",
+                   "Hiragino Sans", "Yu Gothic UI", sans-serif;
+      background: var(--bg);
+      color: var(--fg);
+      line-height: 1.7;
+    }
+    header {
+      padding: 2.5rem 1.5rem 1.5rem;
+      text-align: center;
+      border-bottom: 1px solid var(--border);
+    }
+    header h1 {
+      margin: 0;
+      font-size: 1.9rem;
+      letter-spacing: 0.02em;
+    }
+    main {
+      max-width: 640px;
+      margin: 0 auto;
+      padding: 1.75rem 1.25rem 2.5rem;
+    }
+    section {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.25rem 1.4rem;
+      margin-bottom: 1rem;
+    }
+    section h2 { margin: 0 0 0.6rem; font-size: 1.1rem; }
+    section p { margin: 0.4rem 0; }
+    section ul { padding-left: 1.2rem; margin: 0.4rem 0; }
+    section li { margin: 0.25rem 0; }
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    .contact { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.95rem; }
+    .faq-item { margin: 0.9rem 0; }
+    .faq-item .q { font-weight: 600; margin: 0 0 0.2rem; }
+    .faq-item .a { margin: 0; }
+    footer { text-align: center; color: var(--muted); font-size: 0.85rem; padding: 1.25rem; border-top: 1px solid var(--border); }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>建築士単語帳</h1>
+  </header>
+
+  <main>
+    <section>
+      <h2>アプリ概要</h2>
+      <ul>
+        <li>建築士試験に必要な重要単語を、表裏カード形式で覚えるための学習アプリ</li>
+        <li>カテゴリ(計画 / 環境・設備 / 法規 / 構造 / 施工)別に学習できる</li>
+        <li>お気に入り・苦手・暗記済みでフィルタして復習</li>
+        <li>ユーザーが自分で単語を追加・編集・削除できる</li>
+        <li>すべて端末内に保存。ログイン不要、オフラインで動作</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>サポート</h2>
+      <p>お問い合わせ:</p>
+      <p class="contact"><a href="mailto:kinniku.kin.gin@gmail.com">kinniku.kin.gin@gmail.com</a></p>
+    </section>
+
+    <section>
+      <h2>FAQ</h2>
+      <div class="faq-item">
+        <p class="q">Q. 広告を削除できますか?</p>
+        <p class="a">A. 設定タブ → 「広告を削除」のアプリ内購入で永久に広告を削除できます。</p>
+      </div>
+      <div class="faq-item">
+        <p class="q">Q. データは引き継げますか?</p>
+        <p class="a">A. 現在は端末内保存です。アプリを削除するとデータも消えます。</p>
+      </div>
+      <div class="faq-item">
+        <p class="q">Q. 自分で単語を追加できますか?</p>
+        <p class="a">A. 「追加」タブから自由に単語を登録できます。あとから編集・削除も可能です。</p>
+      </div>
+      <div class="faq-item">
+        <p class="q">Q. 機種変更したときに購入は復元できますか?</p>
+        <p class="a">A. 設定タブ → 「購入を復元」で同じ Apple ID なら広告削除を引き継げます。</p>
+      </div>
+    </section>
+
+    <section>
+      <h2>Links</h2>
+      <ul>
+        <li><a href="privacy.html">Privacy Policy</a></li>
+      </ul>
+    </section>
+  </main>
+
+  <footer>&copy; 2026 建築士単語帳</footer>
+</body>
+</html>
