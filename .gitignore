@@ -31,3 +31,4 @@ fastlane/test_output
 *~
 *.bak
 *.orig
+build/

@@ -26,6 +26,8 @@ struct StudyView: View {
     @State private var index: Int = 0
     @State private var isFlipped: Bool = false
     @State private var shuffledIDs: [PersistentIdentifier] = []
+    /// この学習でめくった枚数。全画面広告を出すかどうかの判断だけに使う。
+    @State private var advancedCount: Int = 0
 
     let filter: StudyFilter
 
@@ -91,6 +93,16 @@ struct StudyView: View {
         }
         .background(Color(uiColor: .systemGroupedBackground))
         .onAppear { if shuffledIDs.isEmpty { shuffle() } }
+        .onDisappear {
+            // 全画面広告はここだけ。学習を一区切りつけて画面を離れた瞬間に出す。
+            // カードをめくっている最中には出さない。
+            guard advancedCount >= Self.adThresholdCards else { return }
+            advancedCount = 0
+            // 戻る動きが終わる前に出そうとすると iOS に断られる。終わってから呼ぶ。
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) {
+                InterstitialAds.shared.show()
+            }
+        }
     }
 
     private var emptyView: some View {
@@ -242,8 +254,15 @@ struct StudyView: View {
         .buttonStyle(.bordered)
     }
 
+    /// これだけめくっていたら「一区切りついた」とみなす。下回るときは広告を出さない。
+    private static let adThresholdCards = 15
+    /// 区切りに届く前に読み込みを始めておく。表示の瞬間に読み始めると間に合わない。
+    private static let adPreloadCards = 5
+
     private func advance(by delta: Int) {
         guard !filtered.isEmpty else { return }
+        advancedCount += 1
+        if advancedCount == Self.adPreloadCards { InterstitialAds.shared.preload() }
         let next = (index + delta + filtered.count) % filtered.count
         withAnimation(.easeInOut(duration: 0.15)) {
             isFlipped = false
@@ -265,5 +284,6 @@ struct StudyView: View {
         shuffledIDs = base.shuffled().map { $0.persistentModelID }
         index = 0
         isFlipped = false
+        advancedCount = 0
     }
 }

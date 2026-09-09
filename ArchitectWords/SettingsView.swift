@@ -9,6 +9,7 @@ struct SettingsView: View {
 
     @ObservedObject private var purchaseManager = PurchaseManager.shared
     @State private var showPrivacy = false
+    @State private var showDisclaimer = false
     @State private var showResetConfirm = false
     @State private var showSeedReplaceConfirm = false
 
@@ -44,12 +45,19 @@ struct SettingsView: View {
 
                 Section("情報") {
                     Button {
+                        showDisclaimer = true
+                    } label: {
+                        Label("免責事項", systemImage: "exclamationmark.bubble")
+                            .foregroundStyle(.primary)
+                    }
+                    Button {
                         showPrivacy = true
                     } label: {
                         Label("プライバシーポリシー", systemImage: "hand.raised.fill")
                             .foregroundStyle(.primary)
                     }
-                    LabeledContent("バージョン", value: "1.0")
+                    // 版はここに直書きしない。書くと版を上げるたびに古いままになる。
+                    LabeledContent("バージョン", value: Self.appVersion)
                 }
 
                 Section("お問い合わせ") {
@@ -87,12 +95,21 @@ struct SettingsView: View {
             .sheet(isPresented: $showPrivacy) {
                 PrivacyPolicyView()
             }
+            .sheet(isPresented: $showDisclaimer) {
+                DisclaimerView()
+            }
             .task {
                 if purchaseManager.products.isEmpty {
                     await purchaseManager.bootstrap()
                 }
             }
         }
+    }
+
+    /// Info.plist から取る。手で書くと版を上げたときに必ず食い違う。
+    private static var appVersion: String {
+        let v = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "-"
+        return v
     }
 
     @ViewBuilder
@@ -116,7 +133,7 @@ struct SettingsView: View {
                         .foregroundStyle(.primary).font(.title3)
                     VStack(alignment: .leading, spacing: 2) {
                         Text("広告を削除").font(.body).foregroundStyle(.primary)
-                        Text("バナー広告を永久に非表示").font(.caption).foregroundStyle(.secondary)
+                        Text("バナーと全画面の広告を永久に非表示").font(.caption).foregroundStyle(.secondary)
                     }
                     Spacer()
                     if purchaseManager.isPurchasing {

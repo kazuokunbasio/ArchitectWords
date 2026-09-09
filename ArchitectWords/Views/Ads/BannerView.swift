@@ -18,6 +18,17 @@ enum AdsConfig {
         return productionBannerAdUnitID
         #endif
     }
+
+    /// アンカー型アダプティブのサイズ。幅が 0 以下のときは端末幅で代用する。
+    static func adaptiveSize(for width: CGFloat) -> GADAdSize {
+        let w = width > 0 ? width : UIScreen.main.bounds.width
+        return GADCurrentOrientationAnchoredAdaptiveBannerAdSizeWithWidth(w)
+    }
+
+    /// その幅のときのバナーの高さ。SwiftUI 側の枠取りに使う。
+    static func adaptiveHeight(for width: CGFloat) -> CGFloat {
+        adaptiveSize(for: width).size.height
+    }
 }
 
 @MainActor
@@ -39,13 +50,18 @@ enum AdsBootstrap {
 
 struct BannerView: UIViewRepresentable {
     let adUnitID: String
+    /// バナーを置く場所の横幅。アンカー型アダプティブの高さがこれで決まる。
+    let width: CGFloat
 
-    init(adUnitID: String = AdsConfig.bannerAdUnitID) {
+    init(adUnitID: String = AdsConfig.bannerAdUnitID, width: CGFloat) {
         self.adUnitID = adUnitID
+        self.width = width
     }
 
     func makeUIView(context: Context) -> GADBannerView {
-        let banner = GADBannerView(adSize: GADAdSizeBanner)
+        // 固定 320x50 ではなくアンカー型アダプティブを使う。
+        // 端末の幅いっぱいに出るぶん埋まりやすく、単価も上がる。Google が薦めているのもこちら。
+        let banner = GADBannerView(adSize: AdsConfig.adaptiveSize(for: width))
         banner.adUnitID = adUnitID
         banner.rootViewController = Self.topViewController()
         banner.load(Self.nonPersonalizedRequest())
@@ -74,13 +90,18 @@ struct BannerView: UIViewRepresentable {
 }
 
 /// `@AppStorage("adsRemoved")` を尊重し、購入後は自動で消えるバナーコンテナ。
+/// 高さは幅から決まる(アンカー型アダプティブ)ので、ここでは固定値を書かない。
 struct AdBannerContainer: View {
     @AppStorage("adsRemoved") private var adsRemoved: Bool = false
 
     var body: some View {
         if !adsRemoved {
-            BannerView()
-                .frame(height: 50)
+            GeometryReader { geo in
+                BannerView(width: geo.size.width)
+                    .frame(width: geo.size.width,
+                           height: AdsConfig.adaptiveHeight(for: geo.size.width))
+            }
+            .frame(height: AdsConfig.adaptiveHeight(for: UIScreen.main.bounds.width))
         }
     }
 }
